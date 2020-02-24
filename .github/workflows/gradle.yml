@@ -17,6 +17,10 @@ jobs:
         run: ./gradlew --info --stacktrace testAll --refresh-dependencies
         env:
           TRAVIS: 'true'
+      - uses: actions/upload-artifact@v1
+        with:
+          name: JUnit Test Results
+          path: build/reports/allTests
 
   tests-adpotopenjdk-hs-8:
     name: netCDF-Java Tests (AdoptOpenJDK-HS 8)
@@ -45,6 +49,10 @@ jobs:
         run: ./gradlew --info --stacktrace testAll --refresh-dependencies
         env:
           TRAVIS: 'true'
+      - uses: actions/upload-artifact@v1
+        with:
+          name: JUnit Test Results
+          path: build/reports/allTests
 
   spotless:
     name: Code Style Check
