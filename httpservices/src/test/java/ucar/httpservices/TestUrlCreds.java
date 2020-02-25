@@ -40,40 +40,40 @@ public class TestUrlCreds {
 
   @Test
   public void testUrlCred() throws HTTPException {
+    // note: we do not close out method or session, as that will throw off the global connection count
+    // over in HTTPConnections :-/
     String url = "https://" + username + ":" + password + "@" + host + "/something/garbage.grb?query";
     logger.info("Testing {}", url);
-    try (HTTPMethod method = HTTPFactory.Get(url)) {
-      HTTPSession session = method.getSession();
-      method.close();
-      session.setCredentialsProvider(new BasicCredentialsProvider());
-      try (HTTPMethod method2 = HTTPFactory.Get(session, url)) {
-        HTTPSession session2 = method2.getSession();
-        CredentialsProvider credentialsProvider = session2.sessionprovider;
-        assertThat(credentialsProvider).isNotNull();
-        AuthScope expectedAuthScope = new AuthScope(host, 80);
-        Credentials credentials = credentialsProvider.getCredentials(expectedAuthScope);
-        assertThat(credentials).isNotNull();
-        assertThat(credentials.getUserPrincipal().getName()).isEqualTo(username);
-        assertThat(credentials.getPassword()).isEqualTo(password);
-      }
-    }
+    HTTPMethod method = HTTPFactory.Get(url);
+    HTTPSession session = method.getSession();
+    session.setCredentialsProvider(new BasicCredentialsProvider());
+    HTTPMethod method2 = HTTPFactory.Get(session, url);
+    HTTPSession session2 = method2.getSession();
+    CredentialsProvider credentialsProvider = session2.sessionprovider;
+    assertThat(credentialsProvider).isNotNull();
+    AuthScope expectedAuthScope = new AuthScope(host, 80);
+    Credentials credentials = credentialsProvider.getCredentials(expectedAuthScope);
+    assertThat(credentials).isNotNull();
+    assertThat(credentials.getUserPrincipal().getName()).isEqualTo(username);
+    assertThat(credentials.getPassword()).isEqualTo(password);
   }
 
   @Test
   public void testUrlCredDefaultProvider() throws HTTPException {
+    // note: we do not close out method or session, as that will throw off the global connection count
+    // over in HTTPConnections :-/
     String url = "https://" + username + ":" + password + "@" + host + "/something/garbage.grb?query";
     logger.info("Testing {}", url);
-    try (HTTPMethod method = HTTPFactory.Get(url)) {
-      // we should have a default BasicCredentialProvider available, even though
-      // we didn't call the factory with a specific provider
-      HTTPSession session = method.getSession();
-      CredentialsProvider credentialsProvider = session.sessionprovider;
-      assertThat(credentialsProvider).isNotNull();
-      AuthScope expectedAuthScope = new AuthScope(host, 80);
-      Credentials credentials = credentialsProvider.getCredentials(expectedAuthScope);
-      assertThat(credentials).isNotNull();
-      assertThat(credentials.getUserPrincipal().getName()).isEqualTo(username);
-      assertThat(credentials.getPassword()).isEqualTo(password);
-    }
+    HTTPMethod method = HTTPFactory.Get(url);
+    // we should have a default BasicCredentialProvider available, even though
+    // we didn't call the factory with a specific provider
+    HTTPSession session = method.getSession();
+    CredentialsProvider credentialsProvider = session.sessionprovider;
+    assertThat(credentialsProvider).isNotNull();
+    AuthScope expectedAuthScope = new AuthScope(host, 80);
+    Credentials credentials = credentialsProvider.getCredentials(expectedAuthScope);
+    assertThat(credentials).isNotNull();
+    assertThat(credentials.getUserPrincipal().getName()).isEqualTo(username);
+    assertThat(credentials.getPassword()).isEqualTo(password);
   }
 }
